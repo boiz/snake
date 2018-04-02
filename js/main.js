@@ -1,4 +1,3 @@
-
 /*lib*/
 let getRandomInt=max=>Math.floor(Math.random() * Math.floor(max));
 let getBetweenInt=(min, max)=> {
@@ -18,86 +17,64 @@ let canvas={
 	},
 	width:myCanvas.width/mutiplier,
 	height:myCanvas.height/mutiplier,
-	draw:(x,y,color="#777")=>{
-		snake.changeColor(color);
+	draw:({x,y})=>{
+		snake.changeColor("#777");
+		snake.body.push({x,y});
 		ctx.fillRect(x*mutiplier,y*mutiplier,mutiplier,mutiplier);
-		snake.body[x][y]=true;
+	},
+	erase:({x,y})=>{
+		snake.changeColor("gray");
+		snake.body.splice(0,1);
+		ctx.fillRect(x*mutiplier,y*mutiplier,mutiplier,mutiplier);
 	}
 }
 
 let snake={
-	pos:{
-		head:{},
-		tail:{}
-	},
+	head:{},
+	getTail:x=>x=snake.body[0],
+	dir:"",
+	grow:false,
 	body:[],
-	tail:5,
-	changeColor:function(color){
-		ctx.fillStyle=color;
-	}
+	length:5,
+	changeColor:color=>ctx.fillStyle=color
 };
 
-for(let i=0;i<canvas.width;i++) snake.body[i]=[];
+//for(let i=0;i<canvas.width;i++) snake.body[i]=[];
 
-/*let food={
-	pos:{
-		x:getRandomInt(canvas.width),
-		y:getRandomInt(canvas.height)
-	},
-	put:canvas.draw(this.x,this.y,"green")
-};*/
 
 let ctx = myCanvas.getContext("2d");
-
 let dir=["up","down","left","right"];
 
-snake.pos.head={
-	x:snake.pos.tail.x=getBetweenInt(canvas.offset.x,canvas.width-canvas.offset.x),
-	y:snake.pos.tail.y=getBetweenInt(canvas.offset.y,canvas.height-canvas.offset.y)
+snake.head={
+	x:getBetweenInt(canvas.offset.x,canvas.width-canvas.offset.x),
+	y:getBetweenInt(canvas.offset.y,canvas.height-canvas.offset.y)
 }
 
-//canvas.draw(snake.pos.head.x,snake.pos.head.y,"#888"); //head
-snake.dir=dir[getRandomInt(dir.length)];
+canvas.draw(snake.head); //head
 
-/*snake.dir="right";*/
+//snake.dir=dir[getRandomInt(dir.length)];
 
-var intv;
+snake.dir="up";
 
-switch(snake.dir){
+let intv;
+let grow=false;
+
+let move=()=>{switch(snake.dir){
 	case "up":
-		for(let i=0;i<snake.tail;i++) canvas.draw(snake.pos.tail.x,++snake.pos.tail.y);
+		canvas.draw({x:snake.head.x, y:--snake.head.y});
+		if(!snake.grow)canvas.erase(snake.getTail());
 		break;
 	case "down":
-		for(let i=0;i<snake.tail;i++) canvas.draw(snake.pos.tail.x,--snake.pos.tail.y);
+		canvas.draw({x:snake.head.x, y:++snake.head.y});
+		if(!snake.grow)canvas.erase(snake.getTail());
 		break;
 	case "left":
-		for(let i=0;i<snake.tail;i++) canvas.draw(++snake.pos.tail.x,snake.pos.tail.y);
+		canvas.draw({x:--snake.head.x, y:snake.head.y});
+		if(!snake.grow)canvas.erase(snake.getTail());
 		break;
 	case "right":
-		for(let i=0;i<snake.tail;i++) canvas.draw(--snake.pos.tail.x,snake.pos.tail.y);
-		break;
-}
-
-/*
-intv=setInterval(()=>{
-	switch(snake.dir){
-		case "up":
-			canvas.draw(snake.pos.head.x,--snake.pos.head.y);
-			canvas.draw(snake.pos.tail.x,snake.pos.tail.y--,"white");
-			break;
-		case "down":
-			canvas.draw(snake.pos.head.x,++snake.pos.head.y);
-			canvas.draw(snake.pos.tail.x,snake.pos.tail.y++,"white");
-			break;
-		case "left":
-			canvas.draw(--snake.pos.head.x,snake.pos.head.y);
-			canvas.draw(snake.pos.tail.x--,snake.pos.tail.y,"white");
-			break;
-		case "right":
-			canvas.draw(++snake.pos.head.x,snake.pos.head.y);
-			canvas.draw(snake.pos.tail.x++,snake.pos.tail.y,"white");
-			break;		
+		canvas.draw({x:++snake.head.x, y:snake.head.y});
+		if(!snake.grow)canvas.erase(snake.getTail());
+		break;		
 	}
-},speed);
-
-*/
+}
