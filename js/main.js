@@ -101,28 +101,32 @@ let move=()=>{switch(snake.dir){
 	case "right":
 		snake.draw({x:++snake.head.x, y:snake.head.y});
 		snake.lookingforGrow();
-		break;		
+		break;
 	}
 }
 
 onkeydown=(e)=>{
 	switch(e.keyCode){
 		case 37:
-			snake.dir="left";
+			if(snake.dir=="up"||snake.dir=="down") snake.dir="left";
 			break;
 		case 38:
-			snake.dir="up";
+			if(snake.dir=="left"||snake.dir=="right") snake.dir="up";
 			break;
 		case 39:
-			snake.dir="right";
+			if(snake.dir=="up"||snake.dir=="down") snake.dir="right";
 			break;
 		case 40:
-			snake.dir="down";
+			if(snake.dir=="left"||snake.dir=="right") snake.dir="down";
 			break;
 	}
 }
 
 let intv=setInterval(()=>{
+
+	console.log(arrayMatch(snake.body,snake.head));
+
+
 
 	if(posMatch(snake.head,food.pos)) snake.grow=true;
 	move();
