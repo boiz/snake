@@ -39,7 +39,7 @@ let food={
 		food.draw(food.pos);
 	},
 	draw:({x,y})=>{
-		canvas.penColor("yellow");
+		canvas.penColor("#888");
 		canvas.fill(x,y);
 	}
 };
@@ -52,8 +52,7 @@ let snake={
 	body:[],
 	length:5,
 	draw:({x,y})=>{
-/*		canvas.penColor("#777");
-*/		canvas.penColor("#fff");
+		canvas.penColor("#777");
 		snake.body.push({x,y});
 		canvas.fill(x,y);
 	},
@@ -62,14 +61,7 @@ let snake={
 		snake.body.splice(0,1);
 		canvas.fill(x,y);		
 	},
-	lookingforGrow:()=>{
-	if(snake.grow){
-		snake.grow=false;
-		food.create();
-	}
-	else snake.erase(snake.getTail());
-}
-
+	next:{}
 };
 
 let ctx = myCanvas.getContext("2d");
@@ -85,25 +77,50 @@ snake.draw(snake.head); //head
 snake.dir=dir[getRandomInt(dir.length)];
 food.create();
 
-let move=()=>{switch(snake.dir){
-	case "up":
-		snake.draw({x:snake.head.x, y:--snake.head.y});
-		snake.lookingforGrow();
-		break;
-	case "down":
-		snake.draw({x:snake.head.x, y:++snake.head.y});
-		snake.lookingforGrow();
-		break;
-	case "left":
-		snake.draw({x:--snake.head.x, y:snake.head.y});
-		snake.lookingforGrow();
-		break;
-	case "right":
-		snake.draw({x:++snake.head.x, y:snake.head.y});
-		snake.lookingforGrow();
-		break;
+
+let move=()=>{
+	switch(snake.dir){
+		case "up":
+			snake.draw({x:snake.head.x, y:--snake.head.y});
+			break;
+		case "down":
+			snake.draw({x:snake.head.x, y:++snake.head.y});
+			break;
+		case "left":
+			snake.draw({x:--snake.head.x, y:snake.head.y});
+			break;
+		case "right":
+			snake.draw({x:++snake.head.x, y:snake.head.y});
+			break;
+		}
+
+	if(snake.grow){
+		snake.grow=false;
+		food.create();
 	}
+	else snake.erase(snake.getTail());
 }
+
+let tempCreate=()=>{
+
+	switch(snake.dir){
+		case "up":
+			snake.draw({x:snake.head.x, y:--snake.head.y});
+			break;
+		case "down":
+			snake.draw({x:snake.head.x, y:++snake.head.y});
+			break;
+		case "left":
+			snake.draw({x:--snake.head.x, y:snake.head.y});
+			break;
+		case "right":
+			snake.draw({x:++snake.head.x, y:snake.head.y});
+			break;
+		}
+}
+
+for(let i=0;i<snake.length-1;i++) tempCreate();
+
 
 onkeydown=(e)=>{
 	switch(e.keyCode){
@@ -122,12 +139,10 @@ onkeydown=(e)=>{
 	}
 }
 
-let intv=setInterval(()=>{
+/*let intv=setInterval(()=>{
 
 	console.log(arrayMatch(snake.body,snake.head));
 
-
-
 	if(posMatch(snake.head,food.pos)) snake.grow=true;
 	move();
-},200);
+},200);*/
