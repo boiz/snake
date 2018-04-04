@@ -1,3 +1,5 @@
+/*snake game by Chase last edited 4/3/2018*/
+
 /*lib*/
 let getRandomInt=max=>Math.floor(Math.random() * Math.floor(max));
 let getBetweenInt=(min, max)=> {
@@ -36,10 +38,11 @@ let food={
 			x:getRandomInt(canvas.width),
 			y:getRandomInt(canvas.height)		
 		}
-		food.draw(food.pos);
+		if(arrayMatch(snake.body,food.pos)) food.create();
+		else food.draw(food.pos);
 	},
 	draw:({x,y})=>{
-		canvas.penColor("#888");
+		canvas.penColor("yellow");
 		canvas.fill(x,y);
 	}
 };
@@ -47,12 +50,15 @@ let food={
 let snake={
 	head:{},
 	getTail:x=>x=snake.body[0],
-	dir:"",
+	dir:{
+		current:"",
+		pre:""
+	},
 	grow:false,
 	body:[],
 	length:5,
 	draw:({x,y})=>{
-		canvas.penColor("#777");
+		canvas.penColor("#fff");
 		snake.body.push({x,y});
 		canvas.fill(x,y);
 	},
@@ -67,43 +73,60 @@ let snake={
 let ctx = myCanvas.getContext("2d");
 let dir=["up","down","left","right"];
 
-snake.head={
-	x:getBetweenInt(canvas.offset.x,canvas.width-canvas.offset.x),
-	y:getBetweenInt(canvas.offset.y,canvas.height-canvas.offset.y)
-};
-
-snake.draw(snake.head); //head
-
-snake.dir=dir[getRandomInt(dir.length)];
-food.create();
-
-
 let move=()=>{
-	switch(snake.dir){
+	let crash;
+	switch(snake.dir.current){
 		case "up":
-			snake.draw({x:snake.head.x, y:--snake.head.y});
+			snake.next={
+				x:snake.head.x,
+				y:snake.head.y-1
+			};
+			crash=snake.next.y<0;
+			snake.dir.pre="up";
 			break;
 		case "down":
-			snake.draw({x:snake.head.x, y:++snake.head.y});
+			snake.next={
+				x:snake.head.x,
+				y:snake.head.y+1
+			};
+			crash=snake.next.y==canvas.height;		
+			snake.dir.pre="down";
 			break;
 		case "left":
-			snake.draw({x:--snake.head.x, y:snake.head.y});
+			snake.next={
+				x:snake.head.x-1,
+				y:snake.head.y
+			};
+			crash=snake.next.x<0;		
+			snake.dir.pre="left";
 			break;
 		case "right":
-			snake.draw({x:++snake.head.x, y:snake.head.y});
+			snake.next={
+				x:snake.head.x+1,
+				y:snake.head.y
+			};
+			crash=snake.next.x==canvas.width;		
+			snake.dir.pre="right";
 			break;
 		}
 
+	if(crash||arrayMatch(snake.body,snake.next)){
+		clearInterval(intv);
+		start.disabled="";
+		return;
+	};		
+
+	snake.draw(snake.head=snake.next);
 	if(snake.grow){
 		snake.grow=false;
+		score.innerText=Number(score.innerText)+1;
 		food.create();
 	}
 	else snake.erase(snake.getTail());
 }
 
 let tempCreate=()=>{
-
-	switch(snake.dir){
+	switch(snake.dir.current){
 		case "up":
 			snake.draw({x:snake.head.x, y:--snake.head.y});
 			break;
@@ -119,30 +142,47 @@ let tempCreate=()=>{
 		}
 }
 
-for(let i=0;i<snake.length-1;i++) tempCreate();
-
-
 onkeydown=(e)=>{
 	switch(e.keyCode){
 		case 37:
-			if(snake.dir=="up"||snake.dir=="down") snake.dir="left";
+			if(snake.dir.pre=="up"||snake.dir.pre=="down") snake.dir.current="left";
 			break;
 		case 38:
-			if(snake.dir=="left"||snake.dir=="right") snake.dir="up";
+			if(snake.dir.pre=="left"||snake.dir.pre=="right") snake.dir.current="up";
 			break;
 		case 39:
-			if(snake.dir=="up"||snake.dir=="down") snake.dir="right";
+			if(snake.dir.pre=="up"||snake.dir.pre=="down") snake.dir.current="right";
 			break;
 		case 40:
-			if(snake.dir=="left"||snake.dir=="right") snake.dir="down";
+			if(snake.dir.pre=="left"||snake.dir.pre=="right") snake.dir.current="down";
 			break;
 	}
 }
 
-/*let intv=setInterval(()=>{
+let intv;
 
-	console.log(arrayMatch(snake.body,snake.head));
+start.onclick=()=>{
+	start.disabled="disabled";
 
-	if(posMatch(snake.head,food.pos)) snake.grow=true;
-	move();
-},200);*/
+	canvas.penColor("gray");
+	ctx.fillRect(0,0,myCanvas.width,myCanvas.height);
+	snake.body=[];
+
+	snake.head={
+		x:getBetweenInt(canvas.offset.x,canvas.width-canvas.offset.x),
+		y:getBetweenInt(canvas.offset.y,canvas.height-canvas.offset.y)
+	};
+
+	snake.dir.current=dir[getRandomInt(dir.length)];
+	food.create();
+
+	for(let i=0;i<snake.length;i++) tempCreate();
+
+	intv=setInterval(()=>{
+		if(posMatch(snake.head,food.pos)) snake.grow=true;
+		move();
+	},200);
+
+}
+
+start.click();
