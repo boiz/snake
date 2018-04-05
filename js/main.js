@@ -1,4 +1,4 @@
-/*snake game by Chase last edited 4/3/2018*/
+/*snake game by Chase last edited 4/5/2018*/
 
 /*lib*/
 let getRandomInt=max=>Math.floor(Math.random() * Math.floor(max));
@@ -19,7 +19,7 @@ let arrayMatch=(array,item)=>{
 /*initial*/
 
 let mutiplier=10;
-let speed=1000;
+let speed=200;
 let canvas={
 	offset:{
 		x:10,
@@ -58,7 +58,7 @@ let snake={
 	body:[],
 	length:5,
 	draw:({x,y})=>{
-		canvas.penColor("#fff");
+		canvas.penColor("white");
 		snake.body.push({x,y});
 		canvas.fill(x,y);
 	},
@@ -125,7 +125,7 @@ let move=()=>{
 	else snake.erase(snake.getTail());
 }
 
-let tempCreate=()=>{
+let initCreate=()=>{
 	switch(snake.dir.current){
 		case "up":
 			snake.draw({x:snake.head.x, y:--snake.head.y});
@@ -142,7 +142,7 @@ let tempCreate=()=>{
 		}
 }
 
-onkeydown=(e)=>{
+onkeydown=e=>{
 	switch(e.keyCode){
 		case 37:
 			if(snake.dir.pre=="up"||snake.dir.pre=="down") snake.dir.current="left";
@@ -176,12 +176,12 @@ start.onclick=()=>{
 	snake.dir.current=dir[getRandomInt(dir.length)];
 	food.create();
 
-	for(let i=0;i<snake.length;i++) tempCreate();
+	for(let i=0;i<snake.length;i++) initCreate();
 
 	intv=setInterval(()=>{
 		if(posMatch(snake.head,food.pos)) snake.grow=true;
 		move();
-	},200);
+	},speed);
 
 }
 
