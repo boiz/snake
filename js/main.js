@@ -18,17 +18,17 @@ let arrayMatch=(array,item)=>{
 
 /*initial*/
 
-let mutiplier=10;
+let multiplier=10;
 let speed=200;
 let canvas={
 	offset:{
 		x:10,
 		y:10
 	},
-	width:myCanvas.width/mutiplier,
-	height:myCanvas.height/mutiplier,
+	width:myCanvas.width/multiplier,
+	height:myCanvas.height/multiplier,
 	penColor:color=>ctx.fillStyle=color,
-	fill:(x,y)=>ctx.fillRect(x*mutiplier,y*mutiplier,mutiplier,mutiplier)
+	fill:(x,y)=>ctx.fillRect(x*multiplier,y*multiplier,multiplier,multiplier)
 }
 
 let food={
